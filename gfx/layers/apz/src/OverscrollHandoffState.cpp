@@ -5,6 +5,7 @@
 #include "OverscrollHandoffState.h"
 
 #include <algorithm>  // for std::stable_sort
+#include "apz/src/APZUtils.h"
 #include "mozilla/Assertions.h"
 #include "AsyncPanZoomController.h"
 
@@ -64,6 +65,10 @@ void OverscrollHandoffChain::CancelAnimations(
 
 void OverscrollHandoffChain::ClearOverscroll() const {
   ForEachApzc(&AsyncPanZoomController::ClearOverscroll);
+}
+
+void OverscrollHandoffChain::ClearScrolledByHandedOffGesture() const {
+  ForEachApzc(&AsyncPanZoomController::ClearScrolledByHandedOffGesture);
 }
 
 void OverscrollHandoffChain::SnapBackOverscrolledApzc(
@@ -220,6 +225,13 @@ bool OverscrollHandoffChain::ScrollingUpWillTriggerPullToRefresh(
     }
   }
   return false;
+}
+
+bool OverscrollHandoffState::IsScrolledByHandedOffGesture() const {
+  return mChainIndex > 0 &&
+         (mScrollSource == ScrollSource::Touchscreen ||
+          mScrollSource == ScrollSource::Touchpad) &&
+         mChain.GetApzcAtIndex(0)->IsInScrollingGesture();
 }
 
 }  // namespace layers

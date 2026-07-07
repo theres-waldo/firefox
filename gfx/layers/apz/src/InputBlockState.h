@@ -51,6 +51,8 @@ class InputBlockState : public RefCounted<InputBlockState> {
     eConfirmed
   };
 
+  enum class InScrollingGesture { Yes, No };
+
   InputBlockState(const RefPtr<AsyncPanZoomController>& aTargetApzc,
                   TargetConfirmationFlags aFlags);
   virtual ~InputBlockState() = default;
@@ -77,7 +79,8 @@ class InputBlockState : public RefCounted<InputBlockState> {
 
   virtual bool ShouldDropEvents() const;
 
-  void SetScrolledApzc(AsyncPanZoomController* aApzc);
+  void SetScrolledApzc(AsyncPanZoomController* aApzc,
+                       InScrollingGesture aGestureState);
   AsyncPanZoomController* GetScrolledApzc() const;
   bool IsDownchainOfScrolledApzc(AsyncPanZoomController* aApzc) const;
 

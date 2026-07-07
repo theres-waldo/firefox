@@ -163,13 +163,16 @@ bool InputBlockState::IsDownchainOf(AsyncPanZoomController* aA,
   return false;
 }
 
-void InputBlockState::SetScrolledApzc(AsyncPanZoomController* aApzc) {
+void InputBlockState::SetScrolledApzc(AsyncPanZoomController* aApzc,
+                                      InScrollingGesture aGestureState) {
   // An input block should only have one scrolled APZC.
   MOZ_ASSERT(!mScrolledApzc || (StaticPrefs::apz_allow_immediate_handoff()
                                     ? IsDownchainOf(mScrolledApzc, aApzc)
                                     : mScrolledApzc == aApzc));
-
   mScrolledApzc = aApzc;
+  if (aGestureState == InScrollingGesture::Yes) {
+    mScrolledApzc->SetScrolledByHandedOffGesture(true);
+  }
 }
 
 AsyncPanZoomController* InputBlockState::GetScrolledApzc() const {
