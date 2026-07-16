@@ -302,13 +302,13 @@ if CONFIG["MOZ_WIDGET_TOOLKIT"] == "android":
     UNIFIED_SOURCES += [
         "AndroidHardwareBuffer.cpp",
         "apz/src/AndroidAPZ.cpp",
-        "apz/src/AndroidFlingPhysics.cpp",
-        "apz/src/AndroidVelocityTracker.cpp",
     ]
 
 UNIFIED_SOURCES += [
     "AnimationHelper.cpp",
     "AnimationInfo.cpp",
+    "apz/src/AndroidFlingPhysics.cpp",
+    "apz/src/AndroidVelocityTracker.cpp",
     "apz/src/APZCTreeManager.cpp",
     "apz/src/APZInputBridge.cpp",
     "apz/src/APZPublicUtils.cpp",

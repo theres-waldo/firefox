@@ -17,7 +17,7 @@
 #include "Axis.h"                       // for AxisX, AxisY, Axis, etc
 #include "CheckerboardEvent.h"          // for CheckerboardEvent
 #include "Compositor.h"                 // for Compositor
-#include "DesktopFlingPhysics.h"        // for DesktopFlingPhysics
+#include "AndroidFlingPhysics.h"        // for DesktopFlingPhysics
 #include "FrameMetrics.h"               // for FrameMetrics, etc
 #include "GenericFlingAnimation.h"      // for GenericFlingAnimation
 #include "GestureEventListener.h"       // for GestureEventListener
@@ -27,7 +27,7 @@
 #include "InputQueue.h"                 // for InputQueue
 #include "Overscroll.h"                 // for OverscrollAnimation
 #include "OverscrollHandoffState.h"     // for OverscrollHandoffState
-#include "SimpleVelocityTracker.h"      // for SimpleVelocityTracker
+#include "AndroidVelocityTracker.h"     // for SimpleVelocityTracker
 #include "Units.h"                      // for CSSRect, CSSPoint, etc
 #include "UnitTransforms.h"             // for TransformTo
 #include "apz/public/CompositorScrollUpdate.h"
@@ -548,13 +548,13 @@ class MOZ_RAII AutoDynamicToolbarHider final {
 AsyncPanZoomAnimation* PlatformSpecificStateBase::CreateFlingAnimation(
     AsyncPanZoomController& aApzc, const FlingHandoffState& aHandoffState,
     float aPLPPI) {
-  return new GenericFlingAnimation<DesktopFlingPhysics>(aApzc, aHandoffState,
+  return new GenericFlingAnimation<AndroidFlingPhysics>(aApzc, aHandoffState,
                                                         aPLPPI);
 }
 
 UniquePtr<VelocityTracker> PlatformSpecificStateBase::CreateVelocityTracker(
     Axis* aAxis) {
-  return MakeUnique<SimpleVelocityTracker>(aAxis);
+  return MakeUnique<AndroidVelocityTracker>();
 }
 
 // This is a helper class for populating
