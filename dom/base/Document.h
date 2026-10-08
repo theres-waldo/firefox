@@ -1391,6 +1391,17 @@ class Document : public nsINode,
    */
   nsViewportInfo GetViewportInfo(const ScreenIntSize& aDisplaySize);
 
+  /**
+   * Lays this top-level document out at a fixed layout viewport size.
+   */
+  MOZ_CAN_RUN_SCRIPT void SetViewportSizeOverride(float aWidth, float aHeight);
+  MOZ_CAN_RUN_SCRIPT void ClearViewportSizeOverride() {
+    SetViewportSizeOverride(0, 0);
+  }
+  bool HasViewportSizeOverride() const {
+    return !mViewportSizeOverride.IsEmpty();
+  }
+
   void SetMetaViewportData(UniquePtr<ViewportMetaData> aData);
 
   // Returns a ViewportMetaData for this document.
@@ -5851,6 +5862,8 @@ class Document : public nsINode,
   CSSCoord mMaxWidth;
   CSSCoord mMinHeight;
   CSSCoord mMaxHeight;
+
+  CSSSize mViewportSizeOverride;
 
   RefPtr<EventListenerManager> mListenerManager;
 

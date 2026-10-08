@@ -11473,6 +11473,18 @@ nsViewportInfo Document::GetViewportInfo(const ScreenIntSize& aDisplaySize) {
   CSSToScreenScale defaultScale =
       layoutDeviceScale * LayoutDeviceToScreenScale(1.0);
 
+  if (HasViewportSizeOverride()) {
+    // Lay out at exactly the overridden size, ignoring any meta viewport. Start
+    // unzoomed, within the usual zoom limits; chrome sets the zoom it wants.
+    CSSToScreenScale minZoom = layoutDeviceScale * ViewportMinScale();
+    CSSToScreenScale maxZoom = layoutDeviceScale * ViewportMaxScale();
+    return nsViewportInfo(defaultScale, minZoom, maxZoom, mViewportSizeOverride,
+                          nsViewportInfo::AutoSizeFlag::FixedSize,
+                          nsViewportInfo::AutoScaleFlag::FixedScale,
+                          nsViewportInfo::ZoomFlag::AllowZoom,
+                          ViewportFitType::Auto);
+  }
+
   auto* bc = GetBrowsingContext();
   const bool inRDM = bc && bc->InRDMPane();
   const bool ignoreMetaTag = [&] {
@@ -11854,6 +11866,23 @@ static InteractiveWidget ParseInteractiveWidget(
     return InteractiveWidget::OverlaysContent;
   }
   return InteractiveWidgetUtils::DefaultInteractiveWidgetMode();
+}
+
+void Document::SetViewportSizeOverride(float aWidth, float aHeight) {
+  MOZ_ASSERT(IsTopLevelContentDocument(),
+             "Restricted to top-level content documents");
+  CSSSize size(aWidth, aHeight);
+  if (size == mViewportSizeOverride) {
+    return;
+  }
+  mViewportSizeOverride = size;
+
+  // Switch to (or back from) a MobileViewportManager that sizes layout from
+  // GetViewportInfo.
+  if (RefPtr<PresShell> presShell = GetPresShell()) {
+    presShell->MaybeRecreateMobileViewportManager(
+        /* aAfterInitialization = */ true);
+  }
 }
 
 void Document::SetMetaViewportData(UniquePtr<ViewportMetaData> aData) {

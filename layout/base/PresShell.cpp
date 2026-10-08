@@ -12099,6 +12099,13 @@ MobileViewportManager* PresShell::GetMobileViewportManager() const {
   return mMobileViewportManager;
 }
 
+// Whether layout should be sized by the MobileViewportManager from
+// GetViewportInfo, for a meta viewport or a viewport size override.
+static bool ShouldSizeLayoutFromViewportInfo(const Document* aDocument) {
+  return nsLayoutUtils::ShouldHandleMetaViewport(aDocument) ||
+         aDocument->HasViewportSizeOverride();
+}
+
 Maybe<MobileViewportManager::ManagerType> UseMobileViewportManager(
     PresShell* aPresShell, Document* aDocument) {
   // If we're not using APZ, we won't be able to zoom, so there is no
@@ -12108,7 +12115,7 @@ Maybe<MobileViewportManager::ManagerType> UseMobileViewportManager(
       return Nothing();
     }
   }
-  if (nsLayoutUtils::ShouldHandleMetaViewport(aDocument)) {
+  if (ShouldSizeLayoutFromViewportInfo(aDocument)) {
     return Some(MobileViewportManager::ManagerType::VisualAndMetaViewport);
   }
   if (nsLayoutUtils::AllowZoomingForDocument(aDocument)) {
@@ -12187,8 +12194,7 @@ void PresShell::MaybeRecreateMobileViewportManager(bool aAfterInitialization) {
 }
 
 bool PresShell::UsesMobileViewportSizing() const {
-  return mMobileViewportManager &&
-         nsLayoutUtils::ShouldHandleMetaViewport(mDocument);
+  return mMobileViewportManager && ShouldSizeLayoutFromViewportInfo(mDocument);
 }
 
 /*
